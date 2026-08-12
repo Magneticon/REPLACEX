@@ -1,0 +1,300 @@
+﻿<!DOCTYPE HTML>
+<HTML>
+    <HEAD>
+        <META CHARSET="UTF-8" AUTHOR="MAGNETICON">
+        <TITLE>REPLACEX 1.00</TITLE>
+        <STYLE TYPE="TEXT/CSS">
+            BODY{
+                COLOR: #00CC00;
+                BACKGROUND-COLOR: #000000;
+                FONT-SIZE: 20PX;
+                FONT-FAMILY: 'Pcomm Session', monospace;
+            }
+            #CMD{
+                WIDTH: 90VW;
+                HEIGHT: 12.5VH;
+            }
+            .INPOUT{
+                WIDTH: 45VW;
+                HEIGHT: 23VH;
+                COLOR: #00CCFF;
+                BACKGROUND-COLOR: #000000;
+                BORDER: 3PX SOLID #00CC00;
+                FONT-SIZE: 20PX;
+                BORDER-RADIUS: 10PX;
+                OVERFLOW: AUTO;
+            }
+            .OUT{
+                WIDTH: 90VW;
+                HEIGHT: 12VH;
+                OVERFLOW: AUTO;
+                BORDER: 3PX SOLID #00CC00;
+                COLOR: #FFCC00;
+                BACKGROUND-COLOR: #000000;
+                FONT-SIZE: 20PX;
+                BORDER-RADIUS: 10PX;
+            }
+            .TEXT{
+                BORDER: 3PX SOLID #00CC00;
+                COLOR: #FFCC00;
+                BACKGROUND-COLOR: #000000;
+                FONT-SIZE: 20PX;
+                BORDER-RADIUS: 10PX;
+                WIDTH: 83VW;
+                HEIGHT: 25PX;
+            }
+            .OUTPUTS{
+                WIDTH: 95VW;
+                HEIGHT: 38VH;
+                OVERFLOW-Y: AUTO;
+                OVERFLOW-X: HIDDEN;
+                COLOR: #FFCC00;
+                BACKGROUND-COLOR: #000000;
+            }
+            #MBOX{
+                BACKGROUND-COLOR: #0000AA;
+                COLOR: #FF0000;
+                WIDTH: 30VH;
+                HEIGHT: 8VH;
+                RIGHT: 2VH;
+                TOP: 2VH;
+                DISPLAY: FLEX;
+                JUSTIFY-CONTENT: CENTER;
+                ALIGN-ITEMS: CENTER;
+                FONT-SIZE: 4.5VH;
+                FONT-FAMILY: ARIAL;
+                FONT-WEIGHT: BOLD;
+                POSITION: ABSOLUTE;
+                BORDER-RADIUS: 10PX;
+            }
+            #MBOX:HOVER{
+                BACKGROUND-COLOR: #FF0000;
+                COLOR: #0000AA;
+                CURSOR: POINTER;
+            }
+            .BUTTON{
+                COLOR: #00CC00;
+                BACKGROUND-COLOR: #000000;
+                BORDER: 3PX OUTSET #00CC00;
+                DISPLAY: INLINE-FLEX;
+                JUSTIFY-CONTENT: CENTER;
+                FONT-WEIGHT: BOLD;
+                ALIGN-ITEMS: CENTER;
+                /* WIDTH: 200PX; */
+                HEIGHT: 40PX;
+                CURSOR: POINTER;
+                BORDER-RADIUS: 25PX;
+                WIDTH: FIT-CONTENT;
+                WHITE-SPACE: NOWRAP;
+            }
+            .BUTTONTABLE{
+                BORDER-RADIUS: 0PX;
+                WIDTH: FIT-CONTENT;
+                WHITE-SPACE: NOWRAP;
+            }
+            .BUTTON:HOVER{
+                COLOR: #000000;
+                BACKGROUND-COLOR: #00CC00;
+            }
+            #RECORDS{
+                COLOR: #FF00CC;
+            }
+            .RECORD{
+                COLOR: #FF00CC;
+            }
+            .CONTAINER_BELLOW{
+                DISPLAY: FLEX;
+                FLEX-DIRECTION: COLUMN;
+                JUSTIFY-CONTENT: SPACE-AROUND;
+                HEIGHT: 35VH;
+                WIDTH: 90VW;
+            }
+            .CONTAINER_LINE{
+                DISPLAY: FLEX;
+                JUSTIFY-CONTENT: LEFT;
+                ALIGN-ITEMS: CENTER;
+                HEIGHT: AUTO;
+                WIDTH: 100%;
+            }
+            .LINE_TEXT{
+                DISPLAY: FLEX;
+                JUSTIFY-CONTENT: LEFT;
+                ALIGN-ITEMS: CENTER;
+                HEIGHT: 100%;
+                WIDTH: 7VW;
+            }
+        </STYLE>
+        <SCRIPT TYPE="TEXT/JAVASCRIPT">
+            function RUN(type){
+                GtE("OUT").value = "";
+                var d1 = GtE("INP").value;
+                var H = d1.split(/\n/);
+                var d2 = GtE("WHAT").value;
+                var S = d2.split(/\n/);
+                var d3 = GtE("WITH").value;
+                var P = d3.split(/\n/);
+                var R = "";
+                var SK = false;
+                var OVSK = false;
+                var WH = [];
+                var WI = [];
+                var WG = 0;
+                var WF = -1;
+                var CNC = "";
+                var CNN = [];
+                var CNT = 0;
+                for (var g = 0; g < H.length; g++){
+                    var A = "";
+                    if (CNC != "")
+                        A = "%nn?";
+                    if (H[g].trim().startsWith("%n?", 0)){
+                        CNC += ""+A+"%n?";
+                        CNN.push(H[g]);
+                    }
+                    else{
+                        CNC += ""+A+""+H[g];
+                        CNN.push("");
+                    }
+                }
+                for (var g = WG; g < S.length; g++){
+                    var C = false;
+                    if (S[g].trim().startsWith("%+?", 0) || S[g].trim().startsWith("%-?", 0)){
+                        S[g].replaceAll("%+?", "%+?");
+                        S[g].replaceAll("%-?", "%+?");
+                    }
+                    else if (S[g].trim().endsWith("%+?") || S[g].trim().endsWith("%-?")){
+                        S[g].replaceAll("%+?", "%+?");
+                        S[g].replaceAll("%-?", "%+?");
+                        C = true;
+                    }
+                    if (g+1 < S.length){
+                        if (S[g+1].trim().startsWith("%+?", 0) || S[g+1].trim().startsWith("%-?", 0))
+                            C = true;
+                    }
+                    WH.push(S[g]);
+                    if (g == S.length-1)
+                        C = false;
+                    if (C)
+                        continue;
+                    WF = WF+1;
+                    if (WF >= P.length)
+                        break;
+                    else{
+                        WI = [];
+                        for (var f = WF; f < P.length; f++){
+                            C = false;
+                            if (P[f].trim().startsWith("%+?", 0) || P[f].trim().startsWith("%-?", 0)){
+                                P[f].replaceAll("%+?", "%+?");
+                                P[f].replaceAll("%-?", "%+?");
+                            }
+                            else if (P[f].trim().endsWith("%+?", 0) || P[f].trim().endsWith("%-?", 0)){
+                                P[f].replaceAll("%+?", "%+?");
+                                P[f].replaceAll("%-?", "%+?");
+                                C = true;
+                            }
+                            if (f+1 < P.length){
+                                if (P[f+1].trim().startsWith("%+?", 0) || P[f+1].trim().startsWith("%-?", 0))
+                                    C = true;
+                            }
+                            WI.push(P[f]);
+                            if (f == P.length-1)
+                                C = false;
+                            if (C)
+                                continue;
+                        }
+                    }
+                    
+                    for (var i = WH.length-1; i >= 0; i--){
+                        var W = "";
+                        var E = "";
+ //                       for (var j = 0; j < Math.max(WH.length, WI.length); j++){
+                        for (var j = 0; j < Math.min(WH.length, WI.length); j++){
+                            if (j > i){
+                                if (j < WH.length)
+                                    W += "%nn?";
+                                E += "%nn?";
+                            }
+                            if (j < WH.length)
+                                W += WH[j];
+                            if (j < WI.length)
+                                E += WI[j];
+                        }
+                        W = W.replaceAll("%+?", "");
+                        E = E.replaceAll("%+?", "");
+                        var F = E.split("");
+                        E = "";
+                        for (var j = 0; j < F.length; j++){
+                            if (E != "") E += "%nnn?";
+                            E += ""+F[j];
+                        }
+                        if (type){
+                            var U = -1;
+                            do{
+                                U = CNC.toLowerCase().indexOf(W.toLowerCase());
+                                if (U > -1){
+                                    var AC = CNC.substring(0, U);
+                                    var BC = CNC.substring(U+W.length);
+                                    CNC = AC+""+E+""+BC;
+                                    CNT += 1;
+                                }
+                            }
+                            while(U > -1);
+                   //       var REX = new RegExp(W, "ig")
+                   //       CNC = CNC.replace(REX, function(x){CNT+=1;return E;});
+                        }
+                        else
+                            CNC = CNC.replaceAll(W, function(x){CNT += 1; return E;});
+                    }
+                    WH = [];
+                    WG = g;
+                }
+                CNC = CNC.replaceAll("%nnn?", "");
+                var CNS = CNC.split("%nn?");
+                var R = "";
+                for (var i = 0; i < CNS.length; i++){
+                    var A = "";
+                    if (R.length > 0) A = "\n";
+                    if (CNS[i] == "%n?")
+                        R += A+""+CNN[i];
+                    else if (CNS[i] == "%s?")
+                        continue;
+                    else
+                        R += A+""+CNS[i];
+                }
+                R = R.replaceAll("%n?", "");
+                R = R.replaceAll("%s?", "");
+                R = R.replaceAll("%r?", "");
+                GtE("OUT").value = R;
+                GtE("RECORDS").innerHTML = CNT;
+            }
+            
+            function GtE(id){
+                return document.getElementById(id);
+            }
+        </SCRIPT>
+    </HEAD>
+    <BODY>
+        <H1>REPLACEX 1.00</H1>
+        <I>Save manual work and have your thousands records long object list replaced in no time!</I>
+        <BR><BR>
+        <TABLE>
+            <TR>
+                <TD>INPUT:<BR><TEXTAREA ID="INP" CLASS="INPOUT"></TEXTAREA></TD>
+                <TD STYLE="WIDTH: 5VH;"></TD>
+                <TD>OUTPUT:<BR><TEXTAREA ID="OUT" CLASS="INPOUT" STYLE="COLOR: #CC0000;"></TEXTAREA></TD>
+            </TR>
+        </TABLE>
+        <BR>
+        <SPAN CLASS="BUTTON" ONCLICK="JAVASCRIPT: RUN(false);">&nbsp;&nbsp;PROCESS&nbsp;&nbsp;</SPAN>
+        <SPAN CLASS="BUTTON" ONCLICK="JAVASCRIPT: RUN(true);">&nbsp;&nbsp;PROCESS CASE INSENSITIVE&nbsp;&nbsp;</SPAN>
+        <SPAN STYLE="POSITION: ABSOLUTE; RIGHT: 10VH;"><B>TOTAL AMOUNT OF OCCURENCES PROCESSED:&nbsp;</B><SPAN ID="RECORDS">0</SPAN></SPAN>
+        <BR><BR>
+        <DIV CLASS="CONTAINER_BELLOW">
+            <TABLE>
+                <TR><TD>REPLACE WHAT:<BR><TEXTAREA ID="WHAT" CLASS="OUT"></TEXTAREA></TD></TR>
+                <TR><TD>REPLACE WITH:<BR><TEXTAREA ID="WITH" CLASS="OUT" STYLE="COLOR: #CC0000;"></TEXTAREA></TD></TR>
+            </TABLE>
+        </DIV>
+        <DIV ID="MBOX" ONCLICK="JAVASCRIPT: window.open('https://github.com/Magneticon', '_blank');">Magneticon</DIV>
+    </BODY>
+</HTML>
